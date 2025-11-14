@@ -3,13 +3,29 @@ from datetime import datetime, timedelta
 
 # -------- Level 1 --------
 # TODO: Create a function to view all books that are currently available
-# Output should include book ID, title, and author
+# Output should include book ID, title, and author 
+
+def view_available_books(): 
+    print("\nAvailable Books:") 
+    for book in library_books: 
+        if book["available"] == True: 
+            print(f"{book['id']} - {book['title']} by {book['author']}") 
 
 
 # -------- Level 2 --------
 # TODO: Create a function to search books by author OR genre
 # Search should be case-insensitive
-# Return a list of matching books
+# Return a list of matching books 
+
+def search_books(): 
+    term = input("Search by author or genre: ").lower() 
+    results = [] 
+
+    for book in library_books: 
+        if term in book["author"].lower() or term in book["genre"].lower(): 
+            results.append(book) 
+
+    return results
 
 
 # -------- Level 3 --------
@@ -21,13 +37,66 @@ from datetime import datetime, timedelta
 # If it is not available:
 #   - Print a message saying it's already checked out
 
+def checkout_book(): 
+    book_id = input("Enter the book ID to check out: ") 
+
+    for book in library_books: 
+        if book["id"] == book_id: 
+            if book["available"]: 
+                book["available"] = False 
+                book["due_date"] = (datetime.now() + timedelta(weeks=2)).strftime("%Y-%m-%d") 
+                book["checkouts"] += 1 
+                print(f"You checked out '{book['title']}'.") 
+                return 
+            else: 
+                print("That book is already checked out.") 
+                return  
+
+    print("Book ID not found.")
 
 # -------- Level 4 --------
 # TODO: Create a function to return a book by ID
 # Set its availability to True and clear the due_date
 
 # TODO: Create a function to list all overdue books
-# A book is overdue if its due_date is before today AND it is still checked out
+# A book is overdue if its due_date is before today AND it is still checked out  
+
+def return_book():
+    book_id = input("Enter the book ID to return: ")
+
+    for book in library_books:
+        if book["id"] == book_id:
+            if book["available"] == False:
+                book["available"] = True
+                book["due_date"] = None
+                print(f"Returned '{book['title']}'")
+                return
+            else:
+                print("That book is not checked out.")
+                return
+    
+    print("Book ID not found.")
+
+
+def view_overdue_books():
+    print("\nOverdue Books:")
+    today = datetime.now()
+
+    found_any = False
+
+    for book in library_books:
+        # overdue = has due date + not available + due date already passed
+        if book["due_date"] is not None and book["available"] == False:
+            # compare dates
+            if today > book["due_date"]:
+                found_any = True
+                due = book["due_date"].strftime("%Y-%m-%d")
+                print(f"{book['id']} - {book['title']} (Due: {due})")
+
+    if not found_any:
+        print("No overdue books right now.")
+
+
 
 
 # -------- Level 5 --------
